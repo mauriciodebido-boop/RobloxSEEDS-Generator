@@ -128,22 +128,13 @@
             100% { opacity: 0; transform: scale(0.9); pointer-events: none; }
         }
 
-        .modal-enter { animation: modalIn 0.5s cubic-bezier(0.32, 0.72, 0, 1) forwards; }
-        .modal-exit { animation: modalOut 0.4s cubic-bezier(0.32, 0.72, 0, 1) forwards; }
-        @keyframes modalIn {
-            from { opacity: 0; transform: translateY(100px) scale(0.9); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes modalOut {
-            from { opacity: 1; transform: translateY(0) scale(1); }
-            to { opacity: 0; transform: translateY(40px) scale(0.95); }
-        }
-
         /* Input styling */
         .ios-input {
             background: rgba(118, 118, 128, 0.12);
             color: #1c1c1e;
             transition: all 0.2s ease;
+            -webkit-user-select: text;
+            user-select: text;
         }
         .ios-input:focus {
             background: rgba(118, 118, 128, 0.18);
@@ -240,26 +231,13 @@
                         class="ios-input w-full rounded-2xl px-5 py-4 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-ios-blue/30">
                 </div>
 
-                <!-- Complexity -->
-                <div class="space-y-2">
-                    <label for="seed-randomness" class="block text-[13px] uppercase tracking-wider font-semibold text-ios-muted ml-2">Complexity</label>
-                    <div class="relative">
-                        <select id="seed-randomness" class="ios-input w-full rounded-2xl px-5 py-4 text-lg font-semibold appearance-none cursor-pointer">
-                            <option value="low">Low (Numbers)</option>
-                            <option value="medium">Medium (Letters)</option>
-                            <option value="high" selected>High (Alphanumeric)</option>
-                            <option value="ultra">Ultra (Alpha + Symbols)</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-5 flex items-center pointer-events-none text-gray-400">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path></svg>
-                        </div>
-                    </div>
-                </div>
-
                 <button id="generate-btn" class="w-full py-4 bg-ios-blue text-white text-lg font-semibold rounded-2xl active:bg-blue-600 active:scale-[0.98] transition-all duration-200 mt-4 shadow-lg shadow-blue-500/20">
                     Generate Seeds
                 </button>
             </div>
+            
+            <!-- Safe Area Spacer for iOS Home Bar -->
+            <div class="h-[env(safe-area-inset-bottom)] w-full"></div>
         </div>
     </div>
 
@@ -286,18 +264,13 @@
         const seedContainer = document.getElementById('seed-container');
         const emptyState = document.getElementById('empty-state');
         const seedCountInput = document.getElementById('seed-count');
-        const seedRandomnessSelect = document.getElementById('seed-randomness');
         const toastContainer = document.getElementById('toast-container');
         
         const contextMenu = document.getElementById('context-menu');
         const contextMenuList = document.getElementById('context-menu-list');
 
-        const CHAR_POOLS = {
-            low: "0123456789",
-            medium: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-            high: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-            ultra: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*+"
-        };
+        // Character pool for generating the favorite custom seed format (Alphanumeric A-Z, 0-9)
+        const CHAR_POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
         // Initialize
         generateBtn.addEventListener('click', () => { haptic.heavy(); handleGenerate(); });
@@ -319,7 +292,6 @@
         // Modal Logic
         function showModal() {
             modal.classList.remove('hidden');
-            // Small delay to allow display:block to apply before animating opacity
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
                 modal.classList.add('opacity-100');
@@ -330,6 +302,7 @@
         function hideModal() {
             modal.classList.remove('opacity-100');
             modal.classList.add('opacity-0');
+            modalContent.style.transition = 'transform 0.4s cubic-bezier(0.32, 0.72, 0, 1)';
             modalContent.style.transform = window.innerWidth < 640 ? 'translateY(100%)' : 'translateY(40px) scale(0.95)';
             setTimeout(() => {
                 modal.classList.add('hidden');
@@ -338,32 +311,31 @@
 
         function handleGenerate(isInitial = false) {
             let count = parseInt(seedCountInput.value);
-            const randomnessLevel = seedRandomnessSelect.value;
             if (isNaN(count) || count < 1) count = 1;
             if (count > 1000) count = 1000;
             seedCountInput.value = count; 
 
-            generateSeedsUI(count, randomnessLevel);
+            generateSeedsUI(count);
             if(!isInitial) hideModal();
         }
 
-        function generateSingleSeed(poolName) {
-            const chars = CHAR_POOLS[poolName] || CHAR_POOLS['high'];
+        // Generates seeds matching the style: RE-XN7F-9JY8-C3YP-AXDY
+        function generateSingleSeed() {
             let seed = "RE-";
             for (let block = 0; block < 4; block++) {
                 for (let i = 0; i < 4; i++) {
-                    seed += chars[Math.floor(Math.random() * chars.length)];
+                    seed += CHAR_POOL[Math.floor(Math.random() * CHAR_POOL.length)];
                 }
                 if (block < 3) seed += "-";
             }
             return seed;
         }
 
-        function generateSeedsUI(count, randomnessLevel) {
+        function generateSeedsUI(count) {
             seedContainer.innerHTML = ''; 
 
             for (let i = 0; i < count; i++) {
-                const seedString = generateSingleSeed(randomnessLevel);
+                const seedString = generateSingleSeed();
                 
                 const seedCard = document.createElement('div');
                 seedCard.dataset.tested = "false";
@@ -374,7 +346,6 @@
                     flex items-center justify-between cursor-pointer transition-all duration-300
                 `;
                 
-                // Spring stagger
                 const staggerDelay = Math.min(i, 30) * 0.04;
                 seedCard.style.animationDelay = `${staggerDelay}s`;
                 
@@ -387,14 +358,11 @@
                     </div>
                 `;
 
-                // --- NATIVE-FEEL INTERACTIONS ---
-                
                 seedCard.addEventListener('click', (e) => {
                     if (!contextMenu.classList.contains('hidden')) return;
                     
                     if (seedCard.dataset.tested === "true") {
                         haptic.light();
-                        // Shake animation to indicate it's already used
                         seedCard.style.transform = 'translateX(-5px)';
                         setTimeout(()=> seedCard.style.transform = 'translateX(5px)', 50);
                         setTimeout(()=> seedCard.style.transform = 'translateX(0)', 100);
@@ -406,7 +374,6 @@
                     showDynamicIsland("Copied", "success");
                 });
 
-                // Context Menu handling
                 seedCard.addEventListener('contextmenu', (e) => {
                     e.preventDefault(); 
                     haptic.medium();
@@ -418,7 +385,7 @@
                 
                 seedCard.addEventListener('touchstart', (e) => {
                     isDragging = false;
-                    seedCard.style.transform = 'scale(0.96)'; // Immediate visual feedback
+                    seedCard.style.transform = 'scale(0.96)'; 
                     pressTimer = setTimeout(() => {
                         haptic.heavy();
                         const touch = e.touches[0];
@@ -449,13 +416,11 @@
             }
         }
 
-        // --- CONTEXT MENU LOGIC (iOS Style) ---
-
+        // --- CONTEXT MENU LOGIC ---
         function showContextMenu(x, y, card) {
             const isTested = card.dataset.tested === "true";
             contextMenuList.innerHTML = '';
             
-            // Standard action
             contextMenuList.appendChild(createContextMenuItem('Copy Seed', 'M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z', () => {
                 haptic.success();
                 copyToClipboard(card.dataset.seed);
@@ -472,23 +437,19 @@
                 }));
             }
 
-            // Destructive action
             contextMenuList.appendChild(createContextMenuItem('Delete', 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16', () => {
                 haptic.medium();
                 deleteCard(card);
                 hideContextMenu();
             }, true)); 
 
-            // Reveal Menu
             contextMenu.classList.remove('hidden');
-            // Small timeout to allow transition to apply
             setTimeout(() => {
                 contextMenu.classList.remove('opacity-0');
                 contextMenu.classList.add('opacity-100');
                 contextMenu.style.transform = 'scale(1)';
             }, 10);
             
-            // Positioning logic
             const menuRect = contextMenu.getBoundingClientRect();
             let posX = x + 10;
             let posY = y + 10;
@@ -506,13 +467,12 @@
             contextMenu.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 contextMenu.classList.add('hidden');
-            }, 200); // Wait for fade out
+            }, 200); 
         }
 
         function createContextMenuItem(text, iconPath, onClick, isDanger = false) {
             const li = document.createElement('li');
             const colorClass = isDanger ? 'text-ios-red' : 'text-ios-text';
-            // Only add bottom border if not the last item (handled via CSS sibling selectors usually, but explicit here)
             
             li.className = `px-5 py-3.5 flex items-center justify-between cursor-pointer active:bg-black/5 transition-colors ${colorClass} border-b border-ios-separator last:border-none`;
             li.innerHTML = `
@@ -524,8 +484,6 @@
             li.addEventListener('click', onClick);
             return li;
         }
-
-        // --- VISUAL STATES ---
 
         function markAsTested(cardElement) {
             cardElement.dataset.tested = "true";
@@ -569,8 +527,6 @@
             }, 300); 
         }
 
-        // --- UTILITIES ---
-
         function copyToClipboard(text) {
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(text).catch(() => fallbackCopyText(text));
@@ -590,6 +546,7 @@
             document.body.removeChild(tempInput);
         }
 
+        // Dynamic Toast Banner
         function showDynamicIsland(message, type = "success") {
             const toast = document.createElement('div');
             
@@ -597,19 +554,16 @@
                 ? `<svg class="w-5 h-5 text-ios-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`
                 : `<svg class="w-5 h-5 text-ios-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
 
-            // Animation classes
             toast.className = 'dynamic-island shadow-xl transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] translate-y-[-100px] scale-50 opacity-0';
             toast.innerHTML = `${icon} <span>${message}</span>`;
             
             toastContainer.appendChild(toast);
 
-            // Pop in
             setTimeout(() => {
                 toast.classList.remove('translate-y-[-100px]', 'scale-50', 'opacity-0');
                 toast.classList.add('translate-y-0', 'scale-100', 'opacity-100');
             }, 10);
 
-            // Pop out
             setTimeout(() => {
                 toast.classList.remove('translate-y-0', 'scale-100', 'opacity-100');
                 toast.classList.add('translate-y-[-50px]', 'scale-75', 'opacity-0');
@@ -637,6 +591,45 @@
             window.URL.revokeObjectURL(url);
             showDynamicIsland("Exported", "success");
         }
+
+        // --- SWIPE TO DISMISS LOGIC FOR MOBILE BOTTOM SHEET ---
+        let sheetStartY = 0;
+        let currentSheetY = 0;
+        let isSheetDragging = false;
+
+        modalContent.addEventListener('touchstart', (e) => {
+            if (window.innerWidth >= 640) return; 
+            
+            if (['INPUT', 'SELECT', 'BUTTON'].includes(e.target.tagName)) return;
+            
+            sheetStartY = e.touches[0].clientY;
+            isSheetDragging = true;
+            modalContent.style.transition = 'none'; 
+        }, {passive: true});
+
+        modalContent.addEventListener('touchmove', (e) => {
+            if (!isSheetDragging || window.innerWidth >= 640) return;
+            
+            const deltaY = e.touches[0].clientY - sheetStartY;
+            if (deltaY > 0) { 
+                currentSheetY = deltaY;
+                modalContent.style.transform = `translateY(${deltaY}px)`;
+            }
+        }, {passive: true});
+
+        modalContent.addEventListener('touchend', () => {
+            if (!isSheetDragging || window.innerWidth >= 640) return;
+            isSheetDragging = false;
+            
+            modalContent.style.transition = 'transform 0.4s cubic-bezier(0.32, 0.72, 0, 1)';
+            
+            if (currentSheetY > 100) {
+                hideModal();
+            } else {
+                modalContent.style.transform = 'translateY(0)';
+            }
+            currentSheetY = 0;
+        });
     </script>
 </body>
 </html>
