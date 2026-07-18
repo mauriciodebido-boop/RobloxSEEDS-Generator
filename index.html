@@ -292,6 +292,7 @@
         // Modal Logic
         function showModal() {
             modal.classList.remove('hidden');
+            modal.classList.add('flex'); // CRITICAL FIX: Ensures the modal wrapper is parsed as flexbox
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
                 modal.classList.add('opacity-100');
@@ -306,9 +307,11 @@
             modalContent.style.transform = window.innerWidth < 640 ? 'translateY(100%)' : 'translateY(40px) scale(0.95)';
             setTimeout(() => {
                 modal.classList.add('hidden');
+                modal.classList.remove('flex'); // Remove flex when hidden
             }, 300);
         }
 
+        // Generate Handler
         function handleGenerate(isInitial = false) {
             let count = parseInt(seedCountInput.value);
             if (isNaN(count) || count < 1) count = 1;
