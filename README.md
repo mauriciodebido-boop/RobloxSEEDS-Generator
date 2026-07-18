@@ -1,26 +1,18 @@
-# ROBLOXSEEDS Generator
+# ROBLOX Codes Generator
 
-ROBLOXSEEDS Generator is a modern, lightweight web application designed to generate Roblox-style seed codes through an elegant and responsive interface. Built using **HTML**, **Tailwind CSS**, and **vanilla JavaScript**, it focuses on simplicity, speed, and an enjoyable user experience without relying on external frameworks.
+ROBLOX Codes Generator is a modern web application that simulates the generation of Roblox-style code strings through a clean, responsive, and minimalist interface. Built with **HTML**, **Tailwind CSS**, and **vanilla JavaScript**, the project focuses on creating realistic-looking code formats for UI concepts, game development, demonstrations, mockups, and testing purposes.
 
-The application allows users to generate large batches of randomized seeds with customizable complexity levels, ranging from simple numeric values to advanced alphanumeric combinations with symbols. Every generated seed follows a consistent format, making it suitable for testing, prototyping, game development, or projects that require randomized identifiers.
-
-The interface was designed with a clean, minimalist aesthetic inspired by modern web applications. Smooth animations, fluid transitions, responsive layouts, and polished interactions create an experience that feels fast and intuitive on both desktop and mobile devices.
+The generator supports multiple randomness levels, configurable batch sizes, instant clipboard copying, and smooth animations to provide a polished user experience. Every generated code follows a structured Roblox-inspired format, making it useful for developers who need placeholder codes or realistic examples without manually creating them.
 
 ## Features
 
-* ⚡ Generate up to **1,000 seeds** in a single batch.
-* 🎲 Multiple randomness levels:
-
-  * Low (Numbers)
-  * Medium (Letters)
-  * High (Alphanumeric)
-  * Ultra (Alphanumeric + Symbols)
+* 🎲 Generate hundreds of Roblox-style code strings instantly.
+* ⚙️ Adjustable randomness and complexity levels.
 * 📋 One-click copy to clipboard.
-* ✅ Automatically marks copied seeds as used.
-* ✨ Smooth animations and modern transitions.
-* 📱 Fully responsive design.
-* 🎨 Minimalist UI built with Tailwind CSS.
-* 🚀 No dependencies other than Tailwind CDN.
-* 💻 Pure HTML, CSS, and JavaScript.
+* ✅ Automatically marks copied codes as used.
+* ✨ Smooth animations and fluid transitions.
+* 📱 Fully responsive design for desktop and mobile.
+* 🎨 Modern minimalist interface powered by Tailwind CSS.
+* 🚀 Lightweight and dependency-free (except Tailwind CDN).
 
-Whether you're creating a game, testing procedural generation systems, or simply need randomized formatted strings, ROBLOXSEEDS Generator provides a fast, clean, and user-friendly solution with a polished interface that feels modern and professional.
+> **Disclaimer:** This project generates **randomly formatted Roblox-style codes only**. The generated codes are **not real Roblox gift cards, promo codes, or redeemable codes**, and they do not provide Robux or any Roblox items. They are intended solely for development, testing, educational purposes, and interface demonstrations.
