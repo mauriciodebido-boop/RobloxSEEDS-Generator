@@ -2,168 +2,296 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROBLOXSEEDS Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ROBLOXSEEDS iOS Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Inter', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        ios: {
+                            bg: '#f2f2f7',
+                            card: 'rgba(255, 255, 255, 0.65)',
+                            text: '#1c1c1e',
+                            muted: '#8e8e93',
+                            blue: '#007aff',
+                            red: '#ff3b30',
+                            green: '#34c759',
+                            separator: 'rgba(60, 60, 67, 0.12)'
+                        }
+                    },
+                    transitionTimingFunction: {
+                        'spring': 'cubic-bezier(0.175, 0.885, 0.32, 1.1)',
+                        'ios': 'cubic-bezier(0.32, 0.72, 0, 1)'
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Minimalist scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #d1d5db; }
+        /* Hide scrollbar for a native app feel */
+        ::-webkit-scrollbar { display: none; }
+        * { -ms-overflow-style: none; scrollbar-width: none; }
         
         body {
-            background-color: #fafafa;
-            color: #000000;
+            background-color: #f2f2f7;
+            color: #1c1c1e;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Fluid Modal animations */
-        .modal-enter {
-            animation: fluidFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        /* Animated Mesh Gradient Background */
+        .ambient-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            background: #f2f2f7;
+            overflow: hidden;
         }
-        .modal-exit {
-            animation: fluidFadeOut 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: float 20s infinite ease-in-out alternate;
         }
-        
-        @keyframes fluidFadeIn {
-            from { opacity: 0; transform: scale(0.96) translateY(10px); backdrop-filter: blur(0px); }
-            to { opacity: 1; transform: scale(1) translateY(0); backdrop-filter: blur(8px); }
-        }
-        @keyframes fluidFadeOut {
-            from { opacity: 1; transform: scale(1) translateY(0); backdrop-filter: blur(8px); }
-            to { opacity: 0; transform: scale(0.96) translateY(10px); backdrop-filter: blur(0px); }
+        .orb-1 { width: 60vw; height: 60vw; background: #e0e0e0; top: -10%; left: -10%; animation-delay: 0s; }
+        .orb-2 { width: 50vw; height: 50vw; background: #ffffff; bottom: 10%; right: -10%; animation-delay: -5s; }
+        .orb-3 { width: 70vw; height: 70vw; background: #eaebed; top: 40%; left: 30%; animation-delay: -10s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(5%, 5%) scale(1.05); }
+            100% { transform: translate(-5%, 10%) scale(0.95); }
         }
 
-        /* Staggered Seed Entrance */
-        .seed-enter {
-            animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0;
+        /* iOS Glassmorphism Card */
+        .ios-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 24px -6px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+            border-radius: 24px;
         }
-        @keyframes slideUpFade {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Toast animation */
-        .toast-enter {
-            animation: toastSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        @keyframes toastSlide {
-            from { opacity: 0; transform: translate(-50%, 20px) scale(0.95); }
-            to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+        .ios-card:active {
+            transform: scale(0.96);
+            transition: transform 0.1s cubic-bezier(0.32, 0.72, 0, 1);
+            background: rgba(255, 255, 255, 0.5);
         }
 
-        /* Clean inputs */
-        .minimal-input {
-            transition: all 0.3s ease;
+        /* Context Menu Styles */
+        .ios-context-menu {
+            background: rgba(250, 250, 250, 0.85);
+            backdrop-filter: blur(30px) saturate(200%);
+            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            border: 0.5px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 0 0 0.5px rgba(0, 0, 0, 0.05);
+            border-radius: 18px;
+            overflow: hidden;
+            transform-origin: center;
         }
-        .minimal-input:focus {
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            border-color: #000;
+
+        /* Dynamic Island Toast */
+        .dynamic-island {
+            background: #000;
+            color: #fff;
+            border-radius: 999px;
+            padding: 12px 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: -0.3px;
+        }
+
+        /* Animations */
+        .animate-spring-up { animation: springUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.05) forwards; opacity: 0; }
+        @keyframes springUp {
+            0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .animate-fade-out { animation: fadeOut 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.9); pointer-events: none; }
+        }
+
+        .modal-enter { animation: modalIn 0.5s cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+        .modal-exit { animation: modalOut 0.4s cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(100px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes modalOut {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(40px) scale(0.95); }
+        }
+
+        /* Input styling */
+        .ios-input {
+            background: rgba(118, 118, 128, 0.12);
+            color: #1c1c1e;
+            transition: all 0.2s ease;
+        }
+        .ios-input:focus {
+            background: rgba(118, 118, 128, 0.18);
+            outline: none;
         }
     </style>
 </head>
-<body class="font-sans min-h-screen flex flex-col relative overflow-x-hidden antialiased selection:bg-black selection:text-white">
+<body class="font-sans min-h-screen flex flex-col relative overflow-x-hidden antialiased pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
 
-    <!-- Header -->
-    <header class="w-full px-6 py-5 border-b border-gray-200/60 bg-white/80 backdrop-blur-md sticky top-0 z-30 flex justify-between items-center transition-all duration-300">
-        <div class="flex items-center">
-            <!-- Minimal Title: ROBLOX is lighter, SEEDS is bold and pure black -->
-            <h1 class="text-2xl tracking-tighter select-none">
-                <span class="font-medium text-gray-400">ROBLOX</span><span class="font-black text-black">SEEDS</span>
-            </h1>
+    <!-- Ambient iOS Background -->
+    <div class="ambient-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Floating Navbar -->
+    <header class="w-full px-4 sm:px-8 py-4 sticky top-0 z-30 flex justify-center transition-all duration-300">
+        <div class="bg-white/60 backdrop-blur-3xl border border-white/50 shadow-sm rounded-full px-5 py-3 w-full max-w-6xl flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-gray-900 to-gray-600 text-white flex items-center justify-center font-bold text-lg shadow-md">
+                    R
+                </div>
+                <h1 class="text-xl font-bold tracking-tight select-none hidden sm:block">
+                    Seeds
+                </h1>
+            </div>
+            <div class="flex gap-2">
+                <button id="export-btn" class="p-2 sm:px-4 sm:py-2 bg-ios-bg/50 hover:bg-ios-bg text-ios-blue text-sm font-semibold rounded-full transition-all duration-200 active:scale-95 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    <span class="hidden sm:inline">Export</span>
+                </button>
+                <button id="restart-btn" class="px-5 py-2 bg-ios-blue text-white text-sm font-semibold rounded-full shadow-[0_4px_12px_rgba(0,122,255,0.3)] hover:opacity-90 transition-all duration-200 active:scale-95 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    New Batch
+                </button>
+            </div>
         </div>
-        <button id="restart-btn" class="px-5 py-2.5 bg-white text-black text-sm font-medium rounded-full border border-gray-200 hover:border-black hover:bg-black hover:text-white transition-all duration-300 shadow-sm hover:shadow-md active:scale-95">
-            New Batch
-        </button>
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-grow px-6 py-10 max-w-7xl mx-auto w-full">
-        <div class="mb-10 flex flex-col items-center justify-center text-center">
-            <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-3">Your generated seeds</h2>
-            <p class="text-gray-500 max-w-md text-sm md:text-base">Click any seed card to copy it instantly to your clipboard. Used seeds will be automatically crossed out.</p>
+    <main class="flex-grow px-4 sm:px-8 py-8 sm:py-16 max-w-6xl mx-auto w-full">
+        <div class="mb-12 flex flex-col items-center justify-center text-center px-4">
+            <h2 class="text-4xl sm:text-6xl font-bold tracking-tight mb-4 text-ios-text" style="letter-spacing: -0.04em;">Your Batch</h2>
+            <p class="text-ios-muted max-w-md text-base sm:text-lg font-medium leading-relaxed">
+                Tap to copy a seed instantly. <br class="hidden sm:block"/>
+                <span class="text-ios-text">Long-press</span> or <span class="text-ios-text">right-click</span> for more options.
+            </p>
         </div>
         
         <!-- Seeds Grid -->
-        <div id="seed-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-            <!-- Seeds injected via JS -->
+        <div id="seed-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6">
+            <!-- Empty state -->
+            <div class="col-span-full text-center py-24 text-ios-muted" id="empty-state">
+                <div class="w-20 h-20 bg-black/5 rounded-full flex items-center justify-center mx-auto mb-5">
+                    <svg class="w-10 h-10 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                </div>
+                <p class="font-medium text-lg">No seeds generated.</p>
+                <p class="text-sm mt-1">Tap "New Batch" to begin.</p>
+            </div>
         </div>
     </main>
 
-    <!-- Settings Modal Overlay -->
-    <div id="settings-modal" class="fixed inset-0 bg-black/20 z-50 flex items-center justify-center p-4 modal-enter">
-        <div class="bg-white rounded-[24px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] w-full max-w-md overflow-hidden border border-gray-100">
+    <!-- Native-style Context Menu -->
+    <div id="context-menu" class="fixed z-50 hidden ios-context-menu w-56 opacity-0 transition-opacity duration-200">
+        <ul id="context-menu-list" class="flex flex-col text-[15px] font-medium text-ios-text">
+            <!-- Injected -->
+        </ul>
+    </div>
+
+    <!-- Settings Modal (iOS Bottom Sheet / Modal) -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity duration-300 opacity-0">
+        <div class="absolute inset-0" id="modal-backdrop"></div>
+        
+        <div class="bg-white/90 backdrop-blur-2xl rounded-t-[32px] sm:rounded-[32px] w-full max-w-md overflow-hidden relative z-10 shadow-2xl translate-y-full sm:translate-y-10" id="modal-content" style="transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);">
             
-            <div class="p-8 pb-6 text-center">
-                <h2 class="text-2xl font-bold tracking-tight mb-2">Configure Seeds</h2>
-                <p class="text-sm text-gray-500">Set up your batch parameters.</p>
+            <!-- Drag Indicator for Mobile -->
+            <div class="w-full flex justify-center pt-3 pb-1 sm:hidden">
+                <div class="w-10 h-1.5 bg-gray-300 rounded-full"></div>
+            </div>
+
+            <div class="px-8 pt-6 pb-4 flex justify-between items-center border-b border-ios-separator">
+                <h2 class="text-2xl font-bold tracking-tight text-ios-text">Configure</h2>
+                <button id="close-modal-btn" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 active:scale-90 transition-transform">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             </div>
             
-            <div class="px-8 pb-8 space-y-6">
-                <!-- Amount Input -->
-                <div class="space-y-3">
-                    <label for="seed-count" class="block text-sm font-medium text-gray-700">Amount to generate</label>
+            <div class="p-6 space-y-6">
+                <!-- Amount -->
+                <div class="space-y-2">
+                    <label for="seed-count" class="block text-[13px] uppercase tracking-wider font-semibold text-ios-muted ml-2">Quantity</label>
                     <input type="number" id="seed-count" value="20" min="1" max="1000" 
-                        class="minimal-input w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 text-black focus:outline-none focus:bg-white transition-all">
-                    <p class="text-xs text-gray-400 font-medium">Limit: 1000 seeds per batch.</p>
+                        class="ios-input w-full rounded-2xl px-5 py-4 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-ios-blue/30">
                 </div>
 
-                <!-- Randomness Select -->
-                <div class="space-y-3">
-                    <label for="seed-randomness" class="block text-sm font-medium text-gray-700">Complexity</label>
+                <!-- Complexity -->
+                <div class="space-y-2">
+                    <label for="seed-randomness" class="block text-[13px] uppercase tracking-wider font-semibold text-ios-muted ml-2">Complexity</label>
                     <div class="relative">
-                        <select id="seed-randomness" class="minimal-input w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 text-black focus:outline-none focus:bg-white transition-all appearance-none cursor-pointer">
-                            <option value="low">Low (Numbers: 0-9)</option>
-                            <option value="medium">Medium (Letters: A-Z)</option>
+                        <select id="seed-randomness" class="ios-input w-full rounded-2xl px-5 py-4 text-lg font-semibold appearance-none cursor-pointer">
+                            <option value="low">Low (Numbers)</option>
+                            <option value="medium">Medium (Letters)</option>
                             <option value="high" selected>High (Alphanumeric)</option>
-                            <option value="ultra">Ultra (Alphanumeric + Symbols)</option>
+                            <option value="ultra">Ultra (Alpha + Symbols)</option>
                         </select>
-                        <!-- Custom Select Arrow -->
-                        <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <div class="absolute inset-y-0 right-5 flex items-center pointer-events-none text-gray-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path></svg>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Action Area -->
-            <div class="p-4 px-8 pb-8">
-                <button id="generate-btn" class="w-full py-4 bg-black text-white font-medium rounded-xl hover:bg-gray-800 transition-all duration-300 transform active:scale-[0.98] shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    Generate Now
+                <button id="generate-btn" class="w-full py-4 bg-ios-blue text-white text-lg font-semibold rounded-2xl active:bg-blue-600 active:scale-[0.98] transition-all duration-200 mt-4 shadow-lg shadow-blue-500/20">
+                    Generate Seeds
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Toast Container -->
-    <div id="toast-container" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none flex flex-col items-center gap-3"></div>
+    <!-- Dynamic Island Toast Container -->
+    <div id="toast-container" class="fixed top-8 left-1/2 transform -translate-x-1/2 z-[60] pointer-events-none flex flex-col items-center gap-2"></div>
 
     <script>
+        // Utilities & Haptics
+        const haptic = {
+            light: () => { if(navigator.vibrate) navigator.vibrate(10); },
+            medium: () => { if(navigator.vibrate) navigator.vibrate(20); },
+            heavy: () => { if(navigator.vibrate) navigator.vibrate([30, 50, 30]); },
+            success: () => { if(navigator.vibrate) navigator.vibrate([10, 30, 20]); }
+        };
+
         // DOM Elements
         const modal = document.getElementById('settings-modal');
+        const modalContent = document.getElementById('modal-content');
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        const closeModalBtn = document.getElementById('close-modal-btn');
         const generateBtn = document.getElementById('generate-btn');
         const restartBtn = document.getElementById('restart-btn');
+        const exportBtn = document.getElementById('export-btn');
         const seedContainer = document.getElementById('seed-container');
+        const emptyState = document.getElementById('empty-state');
         const seedCountInput = document.getElementById('seed-count');
         const seedRandomnessSelect = document.getElementById('seed-randomness');
         const toastContainer = document.getElementById('toast-container');
+        
+        const contextMenu = document.getElementById('context-menu');
+        const contextMenuList = document.getElementById('context-menu-list');
 
-        // Character Pools for complexity levels
         const CHAR_POOLS = {
             low: "0123456789",
             medium: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
@@ -171,48 +299,60 @@
             ultra: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*+"
         };
 
-        // Initialize Events
-        generateBtn.addEventListener('click', handleGenerate);
-        restartBtn.addEventListener('click', showModal);
+        // Initialize
+        generateBtn.addEventListener('click', () => { haptic.heavy(); handleGenerate(); });
+        restartBtn.addEventListener('click', () => { haptic.medium(); showModal(); });
+        closeModalBtn.addEventListener('click', hideModal);
+        modalBackdrop.addEventListener('click', hideModal);
+        exportBtn.addEventListener('click', () => { haptic.light(); exportSeeds(); });
 
-        seedCountInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleGenerate();
+        document.addEventListener('click', (e) => {
+            if (!contextMenu.contains(e.target)) hideContextMenu();
+        });
+        window.addEventListener('scroll', hideContextMenu);
+        window.addEventListener('resize', hideContextMenu);
+
+        window.addEventListener('DOMContentLoaded', () => {
+            handleGenerate(true);
         });
 
+        // Modal Logic
         function showModal() {
-            modal.classList.remove('hidden', 'modal-exit');
-            modal.classList.add('modal-enter');
+            modal.classList.remove('hidden');
+            // Small delay to allow display:block to apply before animating opacity
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.classList.add('opacity-100');
+                modalContent.style.transform = 'translateY(0)';
+            }, 10);
         }
 
         function hideModal() {
-            modal.classList.remove('modal-enter');
-            modal.classList.add('modal-exit');
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0');
+            modalContent.style.transform = window.innerWidth < 640 ? 'translateY(100%)' : 'translateY(40px) scale(0.95)';
             setTimeout(() => {
                 modal.classList.add('hidden');
-            }, 400); // Matches the new fluid fade out duration
+            }, 300);
         }
 
-        function handleGenerate() {
+        function handleGenerate(isInitial = false) {
             let count = parseInt(seedCountInput.value);
             const randomnessLevel = seedRandomnessSelect.value;
-
             if (isNaN(count) || count < 1) count = 1;
             if (count > 1000) count = 1000;
             seedCountInput.value = count; 
 
             generateSeedsUI(count, randomnessLevel);
-            hideModal();
+            if(!isInitial) hideModal();
         }
 
         function generateSingleSeed(poolName) {
             const chars = CHAR_POOLS[poolName] || CHAR_POOLS['high'];
             let seed = "RE-";
-            
-            // Format constraint: RE-XXXX-XXXX-XXXX-XXXX
             for (let block = 0; block < 4; block++) {
                 for (let i = 0; i < 4; i++) {
-                    const randomIndex = Math.floor(Math.random() * chars.length);
-                    seed += chars[randomIndex];
+                    seed += chars[Math.floor(Math.random() * chars.length)];
                 }
                 if (block < 3) seed += "-";
             }
@@ -220,88 +360,282 @@
         }
 
         function generateSeedsUI(count, randomnessLevel) {
-            seedContainer.innerHTML = ''; // Clear previous
+            seedContainer.innerHTML = ''; 
 
             for (let i = 0; i < count; i++) {
                 const seedString = generateSingleSeed(randomnessLevel);
                 
-                // Construct highly polished minimal card
                 const seedCard = document.createElement('div');
+                seedCard.dataset.tested = "false";
+                seedCard.dataset.seed = seedString;
+                
                 seedCard.className = `
-                    seed-enter group relative bg-white border border-gray-200 p-6 rounded-2xl 
-                    flex items-center justify-center cursor-pointer shadow-sm
-                    hover:border-black hover:shadow-lg hover:-translate-y-1.5
-                    transition-all duration-400 ease-out overflow-hidden
+                    animate-spring-up ios-card p-5 
+                    flex items-center justify-between cursor-pointer transition-all duration-300
                 `;
                 
-                // Stagger entrance animation based on index
-                // Cap stagger at 20 elements so it doesn't take forever to load huge batches
-                const staggerDelay = Math.min(i, 20) * 0.04;
+                // Spring stagger
+                const staggerDelay = Math.min(i, 30) * 0.04;
                 seedCard.style.animationDelay = `${staggerDelay}s`;
                 
-                const seedText = document.createElement('span');
-                seedText.className = 'font-mono text-[15px] sm:text-base font-medium tracking-widest text-gray-700 group-hover:text-black transition-colors duration-300';
-                seedText.textContent = seedString;
+                seedCard.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="status-indicator w-[10px] h-[10px] rounded-full bg-ios-green shadow-[0_0_12px_rgba(52,199,89,0.5)] transition-all duration-300"></div>
+                        <span class="seed-text font-mono text-[15px] font-semibold tracking-wide text-ios-text transition-all duration-300">
+                            ${seedString}
+                        </span>
+                    </div>
+                `;
 
-                seedCard.addEventListener('click', () => {
+                // --- NATIVE-FEEL INTERACTIONS ---
+                
+                seedCard.addEventListener('click', (e) => {
+                    if (!contextMenu.classList.contains('hidden')) return;
+                    
+                    if (seedCard.dataset.tested === "true") {
+                        haptic.light();
+                        // Shake animation to indicate it's already used
+                        seedCard.style.transform = 'translateX(-5px)';
+                        setTimeout(()=> seedCard.style.transform = 'translateX(5px)', 50);
+                        setTimeout(()=> seedCard.style.transform = 'translateX(0)', 100);
+                        return; 
+                    }
+                    haptic.success();
                     copyToClipboard(seedString);
-                    markAsTested(seedCard, seedText);
-                    showToast("Copied to clipboard");
+                    markAsTested(seedCard);
+                    showDynamicIsland("Copied", "success");
                 });
 
-                seedCard.appendChild(seedText);
+                // Context Menu handling
+                seedCard.addEventListener('contextmenu', (e) => {
+                    e.preventDefault(); 
+                    haptic.medium();
+                    showContextMenu(e.clientX, e.clientY, seedCard);
+                });
+
+                let pressTimer;
+                let isDragging = false;
+                
+                seedCard.addEventListener('touchstart', (e) => {
+                    isDragging = false;
+                    seedCard.style.transform = 'scale(0.96)'; // Immediate visual feedback
+                    pressTimer = setTimeout(() => {
+                        haptic.heavy();
+                        const touch = e.touches[0];
+                        showContextMenu(touch.clientX, touch.clientY, seedCard);
+                    }, 400); 
+                }, {passive: true});
+
+                seedCard.addEventListener('touchmove', () => {
+                    isDragging = true;
+                    seedCard.style.transform = '';
+                    clearTimeout(pressTimer);
+                }, {passive: true});
+
+                seedCard.addEventListener('touchend', (e) => {
+                    clearTimeout(pressTimer);
+                    seedCard.style.transform = '';
+                    if (!contextMenu.classList.contains('hidden') && !isDragging) {
+                        e.preventDefault(); 
+                    }
+                });
+                
+                seedCard.addEventListener('touchcancel', () => {
+                    clearTimeout(pressTimer);
+                    seedCard.style.transform = '';
+                });
+
                 seedContainer.appendChild(seedCard);
             }
         }
 
+        // --- CONTEXT MENU LOGIC (iOS Style) ---
+
+        function showContextMenu(x, y, card) {
+            const isTested = card.dataset.tested === "true";
+            contextMenuList.innerHTML = '';
+            
+            // Standard action
+            contextMenuList.appendChild(createContextMenuItem('Copy Seed', 'M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z', () => {
+                haptic.success();
+                copyToClipboard(card.dataset.seed);
+                showDynamicIsland("Copied", "success");
+                if(!isTested) markAsTested(card);
+                hideContextMenu();
+            }));
+
+            if (isTested) {
+                contextMenuList.appendChild(createContextMenuItem('Restore Seed', 'M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6', () => {
+                    haptic.medium();
+                    restoreCard(card);
+                    hideContextMenu();
+                }));
+            }
+
+            // Destructive action
+            contextMenuList.appendChild(createContextMenuItem('Delete', 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16', () => {
+                haptic.medium();
+                deleteCard(card);
+                hideContextMenu();
+            }, true)); 
+
+            // Reveal Menu
+            contextMenu.classList.remove('hidden');
+            // Small timeout to allow transition to apply
+            setTimeout(() => {
+                contextMenu.classList.remove('opacity-0');
+                contextMenu.classList.add('opacity-100');
+                contextMenu.style.transform = 'scale(1)';
+            }, 10);
+            
+            // Positioning logic
+            const menuRect = contextMenu.getBoundingClientRect();
+            let posX = x + 10;
+            let posY = y + 10;
+            
+            if (posX + menuRect.width > window.innerWidth - 20) posX = window.innerWidth - menuRect.width - 20;
+            if (posY + menuRect.height > window.innerHeight - 20) posY = window.innerHeight - menuRect.height - 20;
+            
+            contextMenu.style.left = `${posX}px`;
+            contextMenu.style.top = `${posY}px`;
+        }
+
+        function hideContextMenu() {
+            contextMenu.classList.remove('opacity-100');
+            contextMenu.classList.add('opacity-0');
+            contextMenu.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                contextMenu.classList.add('hidden');
+            }, 200); // Wait for fade out
+        }
+
+        function createContextMenuItem(text, iconPath, onClick, isDanger = false) {
+            const li = document.createElement('li');
+            const colorClass = isDanger ? 'text-ios-red' : 'text-ios-text';
+            // Only add bottom border if not the last item (handled via CSS sibling selectors usually, but explicit here)
+            
+            li.className = `px-5 py-3.5 flex items-center justify-between cursor-pointer active:bg-black/5 transition-colors ${colorClass} border-b border-ios-separator last:border-none`;
+            li.innerHTML = `
+                <span>${text}</span>
+                <svg class="w-5 h-5 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${iconPath}"></path>
+                </svg>
+            `;
+            li.addEventListener('click', onClick);
+            return li;
+        }
+
+        // --- VISUAL STATES ---
+
+        function markAsTested(cardElement) {
+            cardElement.dataset.tested = "true";
+            const textElement = cardElement.querySelector('.seed-text');
+            const dotElement = cardElement.querySelector('.status-indicator');
+            
+            textElement.classList.add('opacity-40');
+            dotElement.classList.remove('bg-ios-green', 'shadow-[0_0_12px_rgba(52,199,89,0.5)]');
+            dotElement.classList.add('bg-ios-muted');
+            
+            cardElement.classList.remove('backdrop-blur-24px');
+            cardElement.style.background = 'rgba(255, 255, 255, 0.4)';
+            cardElement.style.boxShadow = 'none';
+            cardElement.style.borderColor = 'transparent';
+        }
+
+        function restoreCard(cardElement) {
+            cardElement.dataset.tested = "false";
+            const textElement = cardElement.querySelector('.seed-text');
+            const dotElement = cardElement.querySelector('.status-indicator');
+            
+            textElement.classList.remove('opacity-40');
+            dotElement.classList.add('bg-ios-green', 'shadow-[0_0_12px_rgba(52,199,89,0.5)]');
+            dotElement.classList.remove('bg-ios-muted');
+            
+            cardElement.style.background = '';
+            cardElement.style.boxShadow = '';
+            cardElement.style.borderColor = '';
+            cardElement.classList.add('backdrop-blur-24px');
+        }
+
+        function deleteCard(cardElement) {
+            cardElement.classList.add('animate-fade-out');
+            setTimeout(() => {
+                if(cardElement.parentNode) cardElement.parentNode.removeChild(cardElement);
+                if(seedContainer.children.length === 0 || 
+                  (seedContainer.children.length === 1 && seedContainer.children[0].id === 'empty-state')) {
+                    emptyState.style.display = 'block';
+                    seedContainer.appendChild(emptyState);
+                }
+            }, 300); 
+        }
+
+        // --- UTILITIES ---
+
         function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).catch(() => fallbackCopyText(text));
+            } else {
+                fallbackCopyText(text);
+            }
+        }
+
+        function fallbackCopyText(text) {
             const tempInput = document.createElement("textarea");
             tempInput.value = text;
-            tempInput.style.position = "absolute";
-            tempInput.style.left = "-9999px";
-            tempInput.style.top = "0px";
+            tempInput.style.position = "fixed";
+            tempInput.style.opacity = "0";
             document.body.appendChild(tempInput);
             tempInput.select();
-            
-            try { document.execCommand("copy"); } 
-            catch (err) { console.error("Copy failed: ", err); }
-            
+            try { document.execCommand("copy"); } catch (err) {}
             document.body.removeChild(tempInput);
         }
 
-        function markAsTested(cardElement, textElement) {
-            // Apply visual strike-through
-            textElement.classList.add('line-through', 'text-gray-300');
-            textElement.classList.remove('group-hover:text-black', 'text-gray-700');
-            
-            // Dim and flatten the card
-            cardElement.classList.add('opacity-50', 'border-gray-100', 'bg-gray-50/50', 'scale-[0.98]');
-            cardElement.classList.remove('hover:border-black', 'hover:shadow-lg', 'hover:-translate-y-1.5', 'cursor-pointer', 'shadow-sm');
-            
-            // Disable further clicks
-            cardElement.style.pointerEvents = 'none';
-        }
-
-        function showToast(message) {
+        function showDynamicIsland(message, type = "success") {
             const toast = document.createElement('div');
-            // Minimal black pill toast
-            toast.className = 'bg-black text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 toast-enter text-sm font-medium tracking-wide';
             
-            toast.innerHTML = `
-                <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                ${message}
-            `;
+            const icon = type === "success" 
+                ? `<svg class="w-5 h-5 text-ios-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`
+                : `<svg class="w-5 h-5 text-ios-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+
+            // Animation classes
+            toast.className = 'dynamic-island shadow-xl transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] translate-y-[-100px] scale-50 opacity-0';
+            toast.innerHTML = `${icon} <span>${message}</span>`;
             
             toastContainer.appendChild(toast);
 
+            // Pop in
             setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translate(-50%, 15px) scale(0.95)';
-                toast.style.transition = 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+                toast.classList.remove('translate-y-[-100px]', 'scale-50', 'opacity-0');
+                toast.classList.add('translate-y-0', 'scale-100', 'opacity-100');
+            }, 10);
+
+            // Pop out
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'scale-100', 'opacity-100');
+                toast.classList.add('translate-y-[-50px]', 'scale-75', 'opacity-0');
                 setTimeout(() => {
                     if(toast.parentElement) toastContainer.removeChild(toast);
-                }, 400);
-            }, 2000);
+                }, 500);
+            }, 2500);
+        }
+
+        function exportSeeds() {
+            const seeds = Array.from(seedContainer.querySelectorAll('[data-seed]'))
+                              .map(card => card.dataset.seed);
+            
+            if (seeds.length === 0) {
+                showDynamicIsland("No seeds", "error");
+                return;
+            }
+
+            const blob = new Blob([seeds.join('\n')], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `SEEDS_${new Date().getTime()}.txt`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            showDynamicIsland("Exported", "success");
         }
     </script>
 </body>
