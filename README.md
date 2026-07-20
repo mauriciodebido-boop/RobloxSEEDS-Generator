@@ -1,6 +1,6 @@
 # ROBLOX Codes Generator
 
-ROBLOX Codes Generator is a modern web application that simulates the generation of Roblox-style code strings through a clean, responsive, and minimalist interface. Built with **HTML**, **Tailwind CSS**, and **vanilla JavaScript**, the project focuses on creating realistic-looking code formats for UI concepts, game development, demonstrations, mockups, and testing purposes.
+ROBLOX Codes Generator is a modern web application that simulates the generation of Roblox-style code strings through a clean, responsive, and minimalist interface. Built with **HTML**, **Tailwind CSS**, and **vanilla JavaScript**, the project focuses on creating realistic-looking code formats for UI concepts, game development, demonstrations, mockups, and testing purposes. Link: https://mauriciodebido-boop.github.io/RobloxSEEDS-Generator/
 
 The generator supports multiple randomness levels, configurable batch sizes, instant clipboard copying, and smooth animations to provide a polished user experience. Every generated code follows a structured Roblox-inspired format, making it useful for developers who need placeholder codes or realistic examples without manually creating them.
 
