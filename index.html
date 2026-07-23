@@ -39,6 +39,9 @@
         ::-webkit-scrollbar { display: none; }
         * { -ms-overflow-style: none; scrollbar-width: none; }
         
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
         body {
             background-color: #f2f2f7;
             color: #1c1c1e;
@@ -46,6 +49,13 @@
             -webkit-user-select: none;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
+            /* Zoomblock constraint */
+            touch-action: pan-x pan-y;
+        }
+
+        /* Prevent input zoom on iOS */
+        input, textarea, select {
+            font-size: 16px !important;
         }
 
         /* Animated Mesh Gradient Background */
@@ -140,6 +150,53 @@
             background: rgba(118, 118, 128, 0.18);
             outline: none;
         }
+
+        /* --- NEW MODIFIER STYLES --- */
+        .ios-toggle {
+            appearance: none;
+            width: 51px;
+            height: 31px;
+            background: rgba(120, 120, 128, 0.16);
+            border-radius: 30px;
+            position: relative;
+            cursor: pointer;
+            outline: none;
+            transition: background 0.3s ease;
+        }
+        .ios-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 27px;
+            height: 27px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.16), 0 3px 1px rgba(0,0,0,0.1);
+            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        .ios-toggle:checked { background: #34c759; }
+        .ios-toggle:checked::after { transform: translateX(20px); }
+
+        .ios-slider {
+            appearance: none;
+            width: 100%;
+            height: 5px;
+            border-radius: 3px;
+            background: rgba(120, 120, 128, 0.2);
+            outline: none;
+        }
+        .ios-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 4px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .ios-slider::-webkit-slider-thumb:active { transform: scale(1.1); }
     </style>
 </head>
 <body class="font-sans min-h-screen flex flex-col relative overflow-x-hidden antialiased pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
@@ -209,35 +266,106 @@
     <div id="settings-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity duration-300 opacity-0">
         <div class="absolute inset-0" id="modal-backdrop"></div>
         
-        <div class="bg-white/90 backdrop-blur-2xl rounded-t-[32px] sm:rounded-[32px] w-full max-w-md overflow-hidden relative z-10 shadow-2xl translate-y-full sm:translate-y-10" id="modal-content" style="transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);">
+        <div class="bg-white/90 backdrop-blur-2xl rounded-t-[32px] sm:rounded-[32px] w-full max-w-md overflow-hidden relative z-10 shadow-2xl translate-y-full sm:translate-y-10 flex flex-col max-h-[90vh]" id="modal-content" style="transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);">
             
             <!-- Drag Indicator for Mobile -->
-            <div class="w-full flex justify-center pt-3 pb-1 sm:hidden">
+            <div class="w-full flex justify-center pt-3 pb-1 sm:hidden shrink-0">
                 <div class="w-10 h-1.5 bg-gray-300 rounded-full"></div>
             </div>
 
-            <div class="px-8 pt-6 pb-4 flex justify-between items-center border-b border-ios-separator">
+            <div class="px-8 pt-6 pb-4 flex justify-between items-center border-b border-ios-separator shrink-0">
                 <h2 class="text-2xl font-bold tracking-tight text-ios-text">Configure</h2>
                 <button id="close-modal-btn" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 active:scale-90 transition-transform">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
             
-            <div class="p-6 space-y-6">
-                <!-- Amount -->
+            <div class="p-6 space-y-5 overflow-y-auto" style="-webkit-overflow-scrolling: touch;">
+                
+                <!-- Presets -->
                 <div class="space-y-2">
-                    <label for="seed-count" class="block text-[13px] uppercase tracking-wider font-semibold text-ios-muted ml-2">Quantity</label>
-                    <input type="number" id="seed-count" value="20" min="1" max="1000" 
-                        class="ios-input w-full rounded-2xl px-5 py-4 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-ios-blue/30">
+                    <label class="block text-[13px] uppercase tracking-wider font-semibold text-ios-muted ml-2">Presets</label>
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                        <button class="preset-btn px-4 py-2 bg-ios-blue text-white rounded-full text-[15px] font-semibold whitespace-nowrap active:scale-95 transition-all shadow-md shadow-blue-500/20" data-preset="classic">Classic</button>
+                        <button class="preset-btn px-4 py-2 bg-ios-bg/80 text-ios-text rounded-full text-[15px] font-medium whitespace-nowrap active:scale-95 transition-all" data-preset="short">Short</button>
+                        <button class="preset-btn px-4 py-2 bg-ios-bg/80 text-ios-text rounded-full text-[15px] font-medium whitespace-nowrap active:scale-95 transition-all" data-preset="pin">PIN Code</button>
+                        <button class="preset-btn px-4 py-2 bg-ios-bg/80 text-ios-text rounded-full text-[15px] font-medium whitespace-nowrap active:scale-95 transition-all" data-preset="complex">Complex</button>
+                    </div>
                 </div>
 
-                <button id="generate-btn" class="w-full py-4 bg-ios-blue text-white text-lg font-semibold rounded-2xl active:bg-blue-600 active:scale-[0.98] transition-all duration-200 mt-4 shadow-lg shadow-blue-500/20">
+                <!-- Format String -->
+                <div class="space-y-2 relative">
+                    <label for="seed-format" class="block text-[13px] uppercase tracking-wider font-semibold text-ios-muted ml-2">Seed Format (* = Random)</label>
+                    <input type="text" id="seed-format" value="RE-****-****-****" 
+                        class="ios-input w-full rounded-2xl px-5 py-4 font-mono focus:outline-none focus:ring-2 focus:ring-ios-blue/30 text-center tracking-wide">
+                    
+                    <!-- Live Preview Box -->
+                    <div class="mt-2 bg-ios-bg/40 rounded-xl p-3 flex flex-col items-center justify-center border border-ios-separator/30">
+                        <span class="text-[11px] font-bold text-ios-muted uppercase tracking-wider mb-1">Live Preview</span>
+                        <span id="seed-preview" class="font-mono font-semibold tracking-wide text-ios-text text-[15px] opacity-90 transition-opacity">
+                            RE-A1B2-C3D4-E5F6
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Advanced Compact Options Dropdown (Animated with Grid) -->
+                <div class="bg-ios-bg/60 rounded-2xl border border-ios-separator/50 overflow-hidden">
+                    <button id="modifier-toggle" class="w-full flex justify-between items-center p-4 font-semibold text-ios-text active:bg-black/5 transition-colors">
+                        <span class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-ios-blue/10 flex items-center justify-center text-ios-blue">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                            </div>
+                            Modifiers
+                        </span>
+                        <span id="modifier-icon" class="text-ios-muted transition-transform duration-300 ease-ios">
+                            <svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="20"><polyline points="6 9 12 15 18 9"/></svg>
+                        </span>
+                    </button>
+                    
+                    <div id="modifier-content" class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-ios">
+                        <div class="overflow-hidden">
+                            <div class="px-5 pb-5 pt-1 space-y-5 border-t border-ios-separator/50">
+                                <!-- Toggles -->
+                                <div class="flex items-center justify-between mt-2">
+                                    <label class="text-[15px] font-medium text-ios-text">Uppercase (A-Z)</label>
+                                    <input type="checkbox" id="opt-upper" checked class="ios-toggle">
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <label class="text-[15px] font-medium text-ios-text">Lowercase (a-z)</label>
+                                    <input type="checkbox" id="opt-lower" class="ios-toggle">
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <label class="text-[15px] font-medium text-ios-text">Numbers (0-9)</label>
+                                    <input type="checkbox" id="opt-num" checked class="ios-toggle">
+                                </div>
+                                
+                                <!-- Probability Slider -->
+                                <div class="pt-3 border-t border-ios-separator/50">
+                                    <div class="flex justify-between text-xs text-ios-muted mb-3 font-semibold uppercase tracking-wider">
+                                        <span id="lbl-letters">Letters: 50%</span>
+                                        <span id="lbl-numbers">Numbers: 50%</span>
+                                    </div>
+                                    <input type="range" id="ratio-slider" min="0" max="100" value="50" class="w-full ios-slider">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Amount -->
+                <div class="space-y-2 pt-2">
+                    <label for="seed-count" class="block text-[13px] uppercase tracking-wider font-semibold text-ios-muted ml-2">Quantity</label>
+                    <input type="number" id="seed-count" value="20" min="1" max="1000" 
+                        class="ios-input w-full rounded-2xl px-5 py-4 font-semibold focus:outline-none focus:ring-2 focus:ring-ios-blue/30 text-lg">
+                </div>
+
+                <button id="generate-btn" class="w-full py-4 bg-ios-blue text-white text-lg font-semibold rounded-2xl active:bg-blue-600 active:scale-[0.98] transition-all duration-200 mt-2 shadow-lg shadow-blue-500/20">
                     Generate Seeds
                 </button>
             </div>
             
             <!-- Safe Area Spacer for iOS Home Bar -->
-            <div class="h-[env(safe-area-inset-bottom)] w-full"></div>
+            <div class="h-[env(safe-area-inset-bottom)] w-full shrink-0"></div>
         </div>
     </div>
 
@@ -263,18 +391,106 @@
         const exportBtn = document.getElementById('export-btn');
         const seedContainer = document.getElementById('seed-container');
         const emptyState = document.getElementById('empty-state');
-        const seedCountInput = document.getElementById('seed-count');
         const toastContainer = document.getElementById('toast-container');
+        
+        // Input Elements
+        const seedCountInput = document.getElementById('seed-count');
+        const seedFormatInput = document.getElementById('seed-format');
+        const seedPreview = document.getElementById('seed-preview');
+        const optUpper = document.getElementById('opt-upper');
+        const optLower = document.getElementById('opt-lower');
+        const optNum = document.getElementById('opt-num');
+        const ratioSlider = document.getElementById('ratio-slider');
+        const lblLetters = document.getElementById('lbl-letters');
+        const lblNumbers = document.getElementById('lbl-numbers');
+        const presetBtns = document.querySelectorAll('.preset-btn');
         
         const contextMenu = document.getElementById('context-menu');
         const contextMenuList = document.getElementById('context-menu-list');
 
-        // Character pool for generating the favorite custom seed format (Alphanumeric A-Z, 0-9)
-        const CHAR_POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        // Character pools
+        const UPPER_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";
+        const NUM_CHARS = "0123456789";
 
-        // Initialize
+        // --- PRESETS CONFIGURATION ---
+        const PRESETS = {
+            classic: { format: 'RE-****-****-****', upper: true, lower: false, num: true, ratio: 50 },
+            short: { format: '****-****', upper: true, lower: true, num: true, ratio: 60 },
+            pin: { format: '******', upper: false, lower: false, num: true, ratio: 0 },
+            complex: { format: '***-***-***-***-***', upper: true, lower: true, num: true, ratio: 75 }
+        };
+
+        // Initialize Accordion
+        const modifierToggle = document.getElementById('modifier-toggle');
+        const modifierContent = document.getElementById('modifier-content');
+        const modifierIcon = document.getElementById('modifier-icon');
+        
+        modifierToggle.addEventListener('click', () => {
+            const isOpen = modifierContent.style.gridTemplateRows === '1fr';
+            modifierContent.style.gridTemplateRows = isOpen ? '0fr' : '1fr';
+            modifierIcon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        });
+
+        // Initialize Live Updates & UI
+        function updateSliderLabels() {
+            const lettersPercent = ratioSlider.value;
+            lblLetters.textContent = `Letters: ${lettersPercent}%`;
+            lblNumbers.textContent = `Numbers: ${100 - lettersPercent}%`;
+        }
+
+        function updateLivePreview() {
+            // Add slight flicker effect to show it's updating
+            seedPreview.style.opacity = '0.5';
+            setTimeout(() => seedPreview.style.opacity = '0.9', 50);
+            
+            const previewText = generateSingleSeed();
+            seedPreview.textContent = previewText || "Format is empty";
+        }
+
+        // Attach listeners for live preview
+        ratioSlider.addEventListener('input', () => {
+            updateSliderLabels();
+            updateLivePreview();
+        });
+        seedFormatInput.addEventListener('input', updateLivePreview);
+        optUpper.addEventListener('change', updateLivePreview);
+        optLower.addEventListener('change', updateLivePreview);
+        optNum.addEventListener('change', updateLivePreview);
+
+        // Handle Preset Clicks
+        presetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                haptic.light();
+                const presetKey = btn.dataset.preset;
+                const config = PRESETS[presetKey];
+                
+                if (config) {
+                    // Update active button styling
+                    presetBtns.forEach(b => {
+                        b.classList.remove('bg-ios-blue', 'text-white', 'shadow-md', 'shadow-blue-500/20');
+                        b.classList.add('bg-ios-bg/80', 'text-ios-text', 'font-medium');
+                        b.classList.remove('font-semibold');
+                    });
+                    btn.classList.add('bg-ios-blue', 'text-white', 'font-semibold', 'shadow-md', 'shadow-blue-500/20');
+                    btn.classList.remove('bg-ios-bg/80', 'text-ios-text', 'font-medium');
+
+                    // Apply config
+                    seedFormatInput.value = config.format;
+                    optUpper.checked = config.upper;
+                    optLower.checked = config.lower;
+                    optNum.checked = config.num;
+                    ratioSlider.value = config.ratio;
+                    
+                    updateSliderLabels();
+                    updateLivePreview();
+                }
+            });
+        });
+
+        // Event Listeners
         generateBtn.addEventListener('click', () => { haptic.heavy(); handleGenerate(); });
-        restartBtn.addEventListener('click', () => { haptic.medium(); showModal(); });
+        restartBtn.addEventListener('click', () => { haptic.medium(); showModal(); updateLivePreview(); });
         closeModalBtn.addEventListener('click', hideModal);
         modalBackdrop.addEventListener('click', hideModal);
         exportBtn.addEventListener('click', () => { haptic.light(); exportSeeds(); });
@@ -287,12 +503,13 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             handleGenerate(true);
+            updateLivePreview();
         });
 
         // Modal Logic
         function showModal() {
             modal.classList.remove('hidden');
-            modal.classList.add('flex'); // CRITICAL FIX: Ensures the modal wrapper is parsed as flexbox
+            modal.classList.add('flex');
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
                 modal.classList.add('opacity-100');
@@ -307,7 +524,7 @@
             modalContent.style.transform = window.innerWidth < 640 ? 'translateY(100%)' : 'translateY(40px) scale(0.95)';
             setTimeout(() => {
                 modal.classList.add('hidden');
-                modal.classList.remove('flex'); // Remove flex when hidden
+                modal.classList.remove('flex');
             }, 300);
         }
 
@@ -322,14 +539,44 @@
             if(!isInitial) hideModal();
         }
 
-        // Generates seeds matching the style: RE-XN7F-9JY8-C3YP-AXDY
+        // Generate Single Seed with Advanced Parsing
         function generateSingleSeed() {
-            let seed = "RE-";
-            for (let block = 0; block < 4; block++) {
-                for (let i = 0; i < 4; i++) {
-                    seed += CHAR_POOL[Math.floor(Math.random() * CHAR_POOL.length)];
+            const formatStr = seedFormatInput.value || "****";
+            const useUpper = optUpper.checked;
+            const useLower = optLower.checked;
+            const useNum = optNum.checked;
+            const letterProb = parseInt(ratioSlider.value) / 100;
+
+            let seed = "";
+            for (let i = 0; i < formatStr.length; i++) {
+                if (formatStr[i] === '*') {
+                    let wantLetter = Math.random() < letterProb;
+                    let charPool = "";
+
+                    // Safe fallbacks if settings contradict probability slider
+                    if (wantLetter && !useUpper && !useLower) wantLetter = false;
+                    if (!wantLetter && !useNum) wantLetter = true;
+
+                    if (wantLetter) {
+                        if (useUpper && useLower) {
+                            charPool = Math.random() < 0.5 ? UPPER_CHARS : LOWER_CHARS;
+                        } else if (useUpper) {
+                            charPool = UPPER_CHARS;
+                        } else if (useLower) {
+                            charPool = LOWER_CHARS;
+                        } else {
+                            charPool = NUM_CHARS; // Absolute fallback
+                        }
+                    } else {
+                        charPool = useNum ? NUM_CHARS : (useUpper ? UPPER_CHARS : (useLower ? LOWER_CHARS : "X"));
+                    }
+
+                    if (charPool === "") charPool = "X";
+                    seed += charPool[Math.floor(Math.random() * charPool.length)];
+                } else {
+                    // Keep non-wildcard characters exactly as typed
+                    seed += formatStr[i];
                 }
-                if (block < 3) seed += "-";
             }
             return seed;
         }
@@ -353,9 +600,9 @@
                 seedCard.style.animationDelay = `${staggerDelay}s`;
                 
                 seedCard.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="status-indicator w-[10px] h-[10px] rounded-full bg-ios-green shadow-[0_0_12px_rgba(52,199,89,0.5)] transition-all duration-300"></div>
-                        <span class="seed-text font-mono text-[15px] font-semibold tracking-wide text-ios-text transition-all duration-300">
+                    <div class="flex items-center gap-3 overflow-hidden w-full">
+                        <div class="status-indicator shrink-0 w-[10px] h-[10px] rounded-full bg-ios-green shadow-[0_0_12px_rgba(52,199,89,0.5)] transition-all duration-300"></div>
+                        <span class="seed-text truncate font-mono text-[15px] font-semibold tracking-wide text-ios-text transition-all duration-300">
                             ${seedString}
                         </span>
                     </div>
@@ -603,7 +850,12 @@
         modalContent.addEventListener('touchstart', (e) => {
             if (window.innerWidth >= 640) return; 
             
-            if (['INPUT', 'SELECT', 'BUTTON'].includes(e.target.tagName)) return;
+            // Allow native scrolling inside the container before trying to swipe the whole modal
+            if (['INPUT', 'SELECT', 'BUTTON', 'SUMMARY', 'LABEL'].includes(e.target.tagName)) return;
+            
+            // Check if we are scrolling within a scrollable area
+            const isScrollable = e.target.closest('.overflow-y-auto');
+            if (isScrollable && isScrollable.scrollTop > 0) return;
             
             sheetStartY = e.touches[0].clientY;
             isSheetDragging = true;
